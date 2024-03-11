@@ -117,3 +117,56 @@ def backtrack(goal, distances):
         current_x, current_y = next_step
 
     return path[::-1]
+
+def GetUserInput():
+    while True:
+        print("Enter the x coordinate of the starting node:")
+        start_x = int(input())
+        print("Enter the y coordinate of the starting node:")
+        start_y = int(input())
+
+        if any(polygon.contains_point((start_x, start_y)) for vertices in obstacles.values() for polygon in [patches.Polygon(vertices)]):
+            print("Point is inside an obstacle. Please enter a valid point.")
+            continue
+
+        break
+
+    while True:
+        print("Enter the x coordinate of the goal node:")
+        goal_x = int(input())
+        print("Enter the y coordinate of the goal node:")
+        goal_y = int(input())
+
+        if any(polygon.contains_point((goal_x, goal_y)) for vertices in obstacles.values() for polygon in [patches.Polygon(vertices)]):
+            print("Point is inside an obstacle. Please enter a valid point.")
+            continue
+
+        break
+
+    return [start_x, start_y], [goal_x, goal_y]
+
+StartNode, GoalNode = GetUserInput()
+
+fig, ax = plt.subplots(figsize=(12, 5))
+ax.set_xlim(0, Workspace[0])
+ax.set_ylim(0, Workspace[1])
+ax.set_aspect('equal')
+
+plot_obstacles_with_clearance(ax)
+ax.plot(StartNode[0], StartNode[1], "rx", markersize='15', label='Start Node')
+ax.plot(GoalNode[0], GoalNode[1], "go", markersize='15', label='Goal Node')
+Map = GenerateMap(ax)
+
+start_time = time.time()
+distances = Dijkstra(StartNode, GoalNode, Map)
+end_time = time.time()
+print("Time taken for Dijkstra's Algorithm: ", end_time - start_time)
+path = backtrack(GoalNode, distances)
+
+
+for i in range(len(path) - 1):
+    ax.plot([path[i][0], path[i + 1][0]], [path[i][1], path[i + 1][1]], 'b-', linewidth=2)
+
+plt.grid(True)
+plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, shadow=True)
+plt.show()
