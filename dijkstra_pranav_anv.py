@@ -96,3 +96,24 @@ def Dijkstra(start, goal, Map):
                     heapq.heappush(pq, (new_dist, (new_x, new_y)))
 
     return distances
+
+def backtrack(goal, distances):
+    global Workspace
+
+    path = [goal]
+    current_x, current_y = goal
+
+    while distances[current_y][current_x] != 0:
+        motion_model = get_motion_model()
+        min_dist = float('inf')
+        next_step = None
+        for dx, dy, _ in motion_model:
+            new_x, new_y = current_x + dx, current_y + dy
+            if 0 <= new_x < Workspace[0] and 0 <= new_y < Workspace[1]:
+                if distances[new_y][new_x] < min_dist:
+                    min_dist = distances[new_y][new_x]
+                    next_step = (new_x, new_y)
+        path.append(next_step)
+        current_x, current_y = next_step
+
+    return path[::-1]
