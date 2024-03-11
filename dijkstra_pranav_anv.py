@@ -170,3 +170,30 @@ for i in range(len(path) - 1):
 plt.grid(True)
 plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, fancybox=True, shadow=True)
 plt.show()
+
+def animate_solution(path, Map):
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.set_xlim(0, Workspace[0])
+    ax.set_ylim(0, Workspace[1])
+    ax.set_aspect('equal')
+
+    plot_obstacles_with_clearance(ax)
+    ax.plot(StartNode[0], StartNode[1], "rx", markersize='15', label='Start Node')
+    ax.plot(GoalNode[0], GoalNode[1], "go", markersize='15', label='Goal Node')
+
+    line, = ax.plot([], [], 'b-', linewidth=2)
+
+    def init():
+        line.set_data([], [])
+        return line,
+
+    def update(frame):
+        x = [path[i][0] for i in range(frame + 1)]
+        y = [path[i][1] for i in range(frame + 1)]
+        line.set_data(x, y)
+        return line,
+
+    anim = FuncAnimation(fig, update, frames=len(path), init_func=init, blit=True)
+    anim.save('path_animation.mp4', writer='ffmpeg', fps=60)
+
+animate_solution(path, Map)
